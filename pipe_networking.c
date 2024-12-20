@@ -47,7 +47,7 @@ int server_handshake(int *to_client) {
   }
   int random = atoi(buffer);
   random++;
-  char* ack;
+  char ack[100];
   sprintf(ack, "%d", random);
   *to_client = open(buffer, O_WRONLY, 0666);
   write(*to_client, ack, sizeof(ack));
