@@ -9,6 +9,12 @@
 
   returns the file descriptor for the upstream pipe.
   =========================*/
+
+int err(){
+    printf("errno %d\n",errno);
+    printf("%s\n",strerror(errno));
+    exit(1);
+}
 int server_setup() {
   char * known = "./known";
   mkfifo(known, 0666);
@@ -28,22 +34,23 @@ int server_setup() {
   returns the file descriptor for the upstream pipe (see server setup).
   =========================*/
 int server_handshake(int *to_client) {
-  server_setup();
-  int synack;
-  char * known = "./known";
-  char * private = "./private";
-  synack = open(known, O_RDONLY, 0666);
+  int from_client;
+  from_client = server_setup();
+  if (from_client == -1){
+    err();
+  }
   char buffer[256];
-  read(synack, buffer, sizeof(buffer));
-  close(synack);
+  int bytesread;
+  bytesread = read(from_client, buffer, sizeof(buffer));
+  if (bytesread == -1){
+    err();
+  }
   int random = atoi(buffer);
-  random++
+  random++;
   char* ack;
   sprintf(ack, "%d", random);
-  int joe;
-  joe = open(private, O_WRONLY, 0666);
-  write(joe, ack, sizeof(ack));
-  int from_client;
+  *to_client = open(buffer, O_WRONLY, 0666);
+  write(*to_client, ack, sizeof(ack));
   return from_client;
 }
 
@@ -58,25 +65,44 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
-  int syn;
   char * known = "./known";
-  char * pid;
-  sprintf(pid, getpid());
-  syn = open(known, O_WRONLY, 0666);
-  to_server = &syn;
-  int w = write(syn, pid, strlen(pid));
-  remove(known);
+  char pid[100];
+  sprintf(pid, "%d", getpid());
+  *to_server = open(known, O_WRONLY, 0666);
+  if (*to_server == -1){
+    err();
+  }
+  int w;
+  w = write(*to_server, pid, strlen(pid));
+  if (w == -1){
+    err();
+  }
   int from_server;
   char * private = "./private";
   mkfifo(private, 0666);
   char buffer[256];
   int random;
-  int * num;
-  random = open("/dev/urandom", num, sizeof(num));
-  sprintf(buffer, "%d", num)
-  from_server = read(private, buffer, sizeof(buffer));
-  remove(private);
-  close(random);
+  int num;
+  random = open("/dev/urandom", O_RDONLY, 0666);
+  int readrandom;
+  readrandom = read(random, &num, 4);
+  if (readrandom == -1){
+    err();
+  }
+  int sprint;
+  sprint = sprintf(buffer, "%d", num);
+  if (sprint == -1){
+    err();
+  }
+  from_server = open(private, O_RDONLY, 0666);
+  if (from_server == -1){
+    err();
+  }
+  int read1;
+  read1 = read(from_server, buffer, sizeof(buffer));
+  if (read1 == -1){
+    err();
+  }
   return from_server;
 }
 
