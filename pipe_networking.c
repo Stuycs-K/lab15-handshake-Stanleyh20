@@ -51,6 +51,7 @@ int server_handshake(int *to_client) {
   sprintf(ack, "%d", random);
   *to_client = open(buffer, O_WRONLY, 0666);
   write(*to_client, ack, sizeof(ack));
+  bytesread = read(from_client, buffer, sizeof(buffer));
   return from_client;
 }
 
@@ -65,42 +66,41 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
+  char * private = "./private";
+  mkfifo(private, 0666);
   char * known = "./known";
-  char pid[100];
-  sprintf(pid, "%d", getpid());
   *to_server = open(known, O_WRONLY, 0666);
   if (*to_server == -1){
     err();
   }
   int w;
-  w = write(*to_server, pid, strlen(pid));
+  w = write(*to_server, private, strlen(private));
   if (w == -1){
     err();
   }
-  int from_server;
-  char * private = "./private";
-  mkfifo(private, 0666);
-  char buffer[256];
-  int random;
+  int pp;
+  pp = open(private, O_RDONLY, 0666);
+  int read1;
   int num;
-  random = open("/dev/urandom", O_RDONLY, 0666);
-  int readrandom;
-  readrandom = read(random, &num, 4);
+  read1 = read(pp, &num, 4);
   if (readrandom == -1){
     err();
   }
+  close(pp);
+  num++;
   int sprint;
+  char buffer[256];
   sprint = sprintf(buffer, "%d", num);
   if (sprint == -1){
     err();
   }
-  from_server = open(private, O_RDONLY, 0666);
+  from_server = open(known, O_WRONLY, 0666);
   if (from_server == -1){
     err();
   }
-  int read1;
-  read1 = read(from_server, buffer, sizeof(buffer));
-  if (read1 == -1){
+  int write1;
+  write1 = write(from_server, buffer, sizeof(buffer));
+  if (write1 == -1){
     err();
   }
   return from_server;
