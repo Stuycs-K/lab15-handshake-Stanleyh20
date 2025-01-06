@@ -40,23 +40,37 @@ int server_handshake(int *to_client) {
   int from_client;
   from_client = server_setup();
   if (from_client == -1){
-    printf("assdfjkl");
     err();
   }
-  char buffer[256];
+  char* buffer = calloc(256, sizeof(char));
   int bytesread;
-  bytesread = read(from_client, buffer, sizeof(buffer));
+  bytesread = read(from_client, buffer, 256);
   printf("5. read syn from pp\n");
   if (bytesread == -1){
     err();
   }
+  /*
+  else{
+    printf("bytesread = %d\n", bytesread);
+  }
+  */
   char* ack = "bibimbop";
   *to_client = open(buffer, O_WRONLY, 0666);
+  if (*to_client == -1){
+    printf("length: %ld", strlen(buffer));
+    printf("%s\n", buffer);
+    err();
+  }
   printf("6. open %s\n", buffer);
-  write(*to_client, ack, strlen(ack));
+  int asdfjkl;
+  asdfjkl = write(*to_client, ack, strlen(ack));
+  if (asdfjkl == -1){
+    err();
+  }
   printf("7. sending bibimbop\n");
   bytesread = read(from_client, buffer, sizeof(buffer));
   printf("9. received response\n");
+  free(buffer);
   return from_client;
 }
 
@@ -83,11 +97,18 @@ int client_handshake(int *to_server) {
   }
   int w;
   w = write(*to_server, private, strlen(private));
+  //printf("strlen(%s) = %ld", private, strlen(private));
   if (w == -1){
     err();
   }
+  /*
+  else{
+    printf("w = %d\n", w);
+  }
+  */
   printf("3. wrote %s to wkp\n", private);
   from_server = open(private, O_RDONLY, 0666);
+  printf("3. open pp\n");
   if (from_server == -1){
     err();
   }
