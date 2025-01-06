@@ -7,8 +7,8 @@ int main() {
 
   from_server = client_handshake( &to_server );
 
-  printf("toserver is %d\n", to_server);
-  printf("fromserver is %d\n", from_server);
+  //printf("toserver is %d\n", to_server);
+  //printf("fromserver is %d\n", from_server);
   while (1){
     int random;
     int r;
