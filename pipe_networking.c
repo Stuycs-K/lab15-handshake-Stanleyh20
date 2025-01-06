@@ -69,6 +69,10 @@ int server_handshake(int *to_client) {
   }
   printf("7. sending bibimbop\n");
   bytesread = read(from_client, buffer, sizeof(buffer));
+  if (bytesread == -1){
+    printf("bytes read == bad");
+    err();
+  }
   printf("9. received response\n");
   free(buffer);
   return from_client;
@@ -119,9 +123,9 @@ int client_handshake(int *to_server) {
     err();
   }
   printf("8. read synack\n");
-  int him;
-  him = close(from_server);
-  printf("8. closed pp\n");
+  //int him;
+  //him = close(from_server);
+  //printf("8. closed pp\n");
   int write1;
   write1 = write(*to_server, buffer, sizeof(buffer));
   printf("8. send back ack\n");
