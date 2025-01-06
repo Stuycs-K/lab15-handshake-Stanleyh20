@@ -17,6 +17,11 @@ int main() {
       printf("r == -1\n");
       err();
     }
+    if (r == 0){
+      printf("Didn't receive any integer. Breaking...\n");
+      break;
+    }
+    //printf("r == %d\n", r);
     printf("Received integer: %d\n", random);
     sleep(1);
   }

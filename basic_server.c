@@ -19,12 +19,15 @@ int main() {
       random = random * -1;
     }
     random %= 100;
-    printf("sent: %d\n", random);
     int w;
     w = write(to_client, &random, 4);
+    printf("sent: %d\n", random);
     //printf("bytes wrote: %d\n", w);
     if (w == -1){
       err();
+    }
+    if (w == 0){
+      printf("Didn't write integer. Breaking...\n");
     }
     sleep(1);
   }
