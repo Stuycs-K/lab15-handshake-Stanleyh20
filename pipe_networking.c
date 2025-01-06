@@ -18,9 +18,12 @@ int err(){
 int server_setup() {
   char * known = "./known";
   mkfifo(known, 0666);
+  printf("1. make wkp\n");
   int from_client;
   from_client = open(known, O_RDONLY, 0666);
+  printf("2. open wkp\n");
   remove(known);
+  printf("4. remove wkp\n");
   return from_client;
 }
 
@@ -37,21 +40,23 @@ int server_handshake(int *to_client) {
   int from_client;
   from_client = server_setup();
   if (from_client == -1){
+    printf("assdfjkl");
     err();
   }
   char buffer[256];
   int bytesread;
   bytesread = read(from_client, buffer, sizeof(buffer));
+  printf("5. read syn from pp\n");
   if (bytesread == -1){
     err();
   }
-  int random = atoi(buffer);
-  random++;
-  char ack[100];
-  sprintf(ack, "%d", random);
+  char* ack = "bibimbop";
   *to_client = open(buffer, O_WRONLY, 0666);
-  write(*to_client, ack, sizeof(ack));
+  printf("6. open %s\n", buffer);
+  write(*to_client, ack, strlen(ack));
+  printf("7. sending bibimbop\n");
   bytesread = read(from_client, buffer, sizeof(buffer));
+  printf("9. received response\n");
   return from_client;
 }
 
@@ -66,10 +71,13 @@ int server_handshake(int *to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
+  int from_server;
   char * private = "./private";
   mkfifo(private, 0666);
+  printf("3. make pp\n");
   char * known = "./known";
   *to_server = open(known, O_WRONLY, 0666);
+  printf("3. open wkp\n");
   if (*to_server == -1){
     err();
   }
@@ -78,29 +86,26 @@ int client_handshake(int *to_server) {
   if (w == -1){
     err();
   }
-  int pp;
-  pp = open(private, O_RDONLY, 0666);
-  int read1;
-  int num;
-  read1 = read(pp, &num, 4);
-  if (readrandom == -1){
-    err();
-  }
-  close(pp);
-  num++;
-  int sprint;
-  char buffer[256];
-  sprint = sprintf(buffer, "%d", num);
-  if (sprint == -1){
-    err();
-  }
-  from_server = open(known, O_WRONLY, 0666);
+  printf("3. wrote %s to wkp\n", private);
+  from_server = open(private, O_RDONLY, 0666);
   if (from_server == -1){
     err();
   }
+  int r;
+  char buffer[100];
+  r = read(from_server, buffer, sizeof(buffer));
+  if (r == -1){
+    err();
+  }
+  printf("8. read synack\n");
+  int him;
+  him = close(from_server);
+  printf("8. closed pp\n");
   int write1;
-  write1 = write(from_server, buffer, sizeof(buffer));
+  write1 = write(*to_server, buffer, sizeof(buffer));
+  printf("8. send back ack\n");
   if (write1 == -1){
+    printf("asdfjklajdfl");
     err();
   }
   return from_server;
