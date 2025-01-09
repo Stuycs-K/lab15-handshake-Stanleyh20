@@ -1,5 +1,10 @@
 #include "pipe_networking.h"
-
+static void sighandler(int signo){
+  if (signo == SIGINT){
+    printf("adfjkl");
+    exit(0);
+  }
+}
 int main() {
   int to_client;
   int from_client;
@@ -20,7 +25,9 @@ int main() {
     }
     random %= 100;
     int w;
+    printf("to_client is %d\n", to_client);
     w = write(to_client, &random, 4);
+    printf("w is %d\n", w);
     printf("sent: %d\n", random);
     //printf("bytes wrote: %d\n", w);
     if (w == -1){
@@ -31,4 +38,5 @@ int main() {
     }
     sleep(1);
   }
+  signal(SIGINT, sighandler);
 }

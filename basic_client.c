@@ -1,5 +1,10 @@
 #include "pipe_networking.h"
 
+static void sighandler(int signo){
+  if (signo == SIGINT){
+    exit(0);
+  }
+}
 int main() {
 
   int to_server;
@@ -7,8 +12,8 @@ int main() {
 
   from_server = client_handshake( &to_server );
 
-  //printf("toserver is %d\n", to_server);
-  //printf("fromserver is %d\n", from_server);
+  printf("toserver is %d\n", to_server);
+  printf("fromserver is %d\n", from_server);
   while (1){
     int random;
     int r;
@@ -25,4 +30,5 @@ int main() {
     printf("Received integer: %d\n", random);
     sleep(1);
   }
+  signal(SIGINT,sighandler);
 }
