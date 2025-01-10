@@ -2,6 +2,9 @@
 
 static void sighandler(int signo){
   if (signo == SIGINT){
+    close(4);
+    close(3);
+    printf("closed and siginted\n");
     exit(0);
   }
 }
@@ -15,6 +18,7 @@ int main() {
   printf("toserver is %d\n", to_server);
   printf("fromserver is %d\n", from_server);
   while (1){
+    signal(SIGINT,sighandler);
     int random;
     int r;
     r = read(from_server, &random, 4);
@@ -30,5 +34,4 @@ int main() {
     printf("Received integer: %d\n", random);
     sleep(1);
   }
-  signal(SIGINT,sighandler);
 }
