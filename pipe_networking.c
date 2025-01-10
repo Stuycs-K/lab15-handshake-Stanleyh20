@@ -43,35 +43,17 @@ int server_setup() {
 int server_handshake(int *to_client) {
   int from_client;
   from_client = server_setup();
-  if (from_client == -1){
-    err();
-  }
   char* buffer = calloc(256, sizeof(char));
   int bytesread;
   bytesread = read(from_client, buffer, 256);
   printf("5. read syn from pp\n");
-  if (bytesread == -1){
-    err();
-  }
   char* ack = "bibimbop";
   *to_client = open(buffer, O_WRONLY, 0666);
-  if (*to_client == -1){
-    printf("length: %ld", strlen(buffer));
-    printf("%s\n", buffer);
-    err();
-  }
   printf("6. open %s\n", buffer);
   int asdfjkl;
   asdfjkl = write(*to_client, ack, strlen(ack));
-  if (asdfjkl == -1){
-    err();
-  }
   printf("7. sending bibimbop\n");
   bytesread = read(from_client, buffer, sizeof(buffer));
-  if (bytesread == -1){
-    printf("bytes read == bad");
-    err();
-  }
   printf("9. received response\n");
   free(buffer);
   return from_client;
@@ -81,28 +63,13 @@ int server_handshake_half(int *to_client, int from_client){
   int bytesread;
   bytesread = read(from_client, buffer, 256);
   printf("5. read syn from pp\n");
-  if (bytesread == -1){
-    err();
-  }
   char* ack = "bibimbop";
   *to_client = open(buffer, O_WRONLY, 0666);
-  if (*to_client == -1){
-    printf("length: %ld\n", strlen(buffer));
-    printf("%s\n", buffer);
-    err();
-  }
   printf("6. open %s\n", buffer);
   int asdfjkl;
   asdfjkl = write(*to_client, ack, strlen(ack));
-  if (asdfjkl == -1){
-    err();
-  }
   printf("7. sending bibimbop\n");
   bytesread = read(from_client, buffer, sizeof(buffer));
-  if (bytesread == -1){
-    printf("bytes read == bad");
-    err();
-  }
   printf("9. received response\n");
   free(buffer);
   return from_client;
@@ -131,38 +98,16 @@ int client_handshake(int *to_server) {
   }
   int w;
   w = write(*to_server, private, strlen(private));
-  //printf("strlen(%s) = %ld", private, strlen(private));
-  if (w == -1){
-    err();
-  }
-  /*
-  else{
-    printf("w = %d\n", w);
-  }
-  */
-  printf("3. wrote %s to wkp\n", private);
+  printf("3. wrote private pipe to wkp\n");
   from_server = open(private, O_RDONLY, 0666);
   printf("3. open pp\n");
-  if (from_server == -1){
-    err();
-  }
   int r;
   char buffer[100];
   r = read(from_server, buffer, sizeof(buffer));
-  if (r == -1){
-    err();
-  }
   printf("8. read synack\n");
-  //int him;
-  //him = close(from_server);
-  //printf("8. closed pp\n");
   int write1;
   write1 = write(*to_server, buffer, sizeof(buffer));
   printf("8. send back ack\n");
-  if (write1 == -1){
-    printf("asdfjklajdfl");
-    err();
-  }
   return from_server;
 }
 
