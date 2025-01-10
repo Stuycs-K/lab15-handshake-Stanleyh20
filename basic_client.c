@@ -4,7 +4,6 @@ static void sighandler(int signo){
   if (signo == SIGINT){
     close(4);
     close(3);
-    printf("closed and siginted\n");
     exit(0);
   }
 }

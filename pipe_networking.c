@@ -21,6 +21,10 @@ int server_setup() {
   printf("1. make wkp\n");
   int from_client;
   from_client = open(known, O_RDONLY, 0666);
+  if (from_client == -1){
+    printf("fromclient\n");
+    err();
+  }
   printf("2. open wkp\n");
   remove(known);
   printf("4. remove wkp\n");
@@ -49,11 +53,6 @@ int server_handshake(int *to_client) {
   if (bytesread == -1){
     err();
   }
-  /*
-  else{
-    printf("bytesread = %d\n", bytesread);
-  }
-  */
   char* ack = "bibimbop";
   *to_client = open(buffer, O_WRONLY, 0666);
   if (*to_client == -1){
@@ -77,7 +76,37 @@ int server_handshake(int *to_client) {
   free(buffer);
   return from_client;
 }
-
+int server_handshake_half(int *to_client, int from_client){
+  char* buffer = calloc(256, sizeof(char));
+  int bytesread;
+  bytesread = read(from_client, buffer, 256);
+  printf("5. read syn from pp\n");
+  if (bytesread == -1){
+    err();
+  }
+  char* ack = "bibimbop";
+  *to_client = open(buffer, O_WRONLY, 0666);
+  if (*to_client == -1){
+    printf("length: %ld\n", strlen(buffer));
+    printf("%s\n", buffer);
+    err();
+  }
+  printf("6. open %s\n", buffer);
+  int asdfjkl;
+  asdfjkl = write(*to_client, ack, strlen(ack));
+  if (asdfjkl == -1){
+    err();
+  }
+  printf("7. sending bibimbop\n");
+  bytesread = read(from_client, buffer, sizeof(buffer));
+  if (bytesread == -1){
+    printf("bytes read == bad");
+    err();
+  }
+  printf("9. received response\n");
+  free(buffer);
+  return from_client;
+}
 
 /*=========================
   client_handshake
@@ -90,7 +119,8 @@ int server_handshake(int *to_client) {
   =========================*/
 int client_handshake(int *to_server) {
   int from_server;
-  char * private = "./private";
+  char private[100];
+  sprintf(private, "./%d", getpid());
   mkfifo(private, 0666);
   printf("3. make pp\n");
   char * known = "./known";
